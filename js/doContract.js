@@ -14,7 +14,7 @@ var Contract = web3.eth.contract(
     	gas: 1000000
 	}
 );
-var mainContract = Contract.at('0x6f29505772a24bf9d8740216cc44b728371f887c');
+var mainContract = Contract.at('0x84e40ccaff24b12b66c7e1514b46a2a46349e320');
 var version = web3.version.api;
 console.log(version);
 console.log(mainContract);
@@ -32,7 +32,7 @@ $("#getCredit .btn-block").click(function() {
 	var amount = $("#doCredit-amount").val();
 	var duration = $("#doCredit-duration").val();
 	console.log("GetCredit "+ID+","+amount+","+duration);
-	mainContract.GetCredit(ID,amount,duration,{gas: 1000000});
+	mainContract.GetCredit(ID,amount,duration,{gas: 1000000}, function(error,result) {if (!error) {console.log(result)}}););
 });
 
 $("#returnCredit .btn-block").click(function() {
