@@ -104,7 +104,7 @@ contract SberbankCrypta{
     function GetDeposit(address _clientWallet, uint _sum, uint _duration)public 
     {
         mint(_clientWallet,_sum);
-        CheckCapital(_sum,false);
+        //CheckCapital(_sum,false);
         transferFrom(_clientWallet,bankAcc,_sum);
         Deposit memory deposit;
         deposit.timeBegin = now;
@@ -136,53 +136,53 @@ function Refund(address _clientWallet) public
     mapping(address=>uint) clientCredits;
     mapping(address=>uint[]) idCredit;
     
-    function GetCredit(uint _sum, uint _duration) public checkInBlackList(msg.sender)
-    {
-        if (idCredit[msg.sender].length < 5)
-        {
-            
-        int rate = int(_sum) * int(_duration) * int(PERIOD)/60;
-        if ((list[msg.sender].clientWallet != msg.sender) && (rate < 10000))
-        {
-       _addToList(msg.sender, rate);
-       CheckCapital(_sum,true);
-            transferFrom(bankAcc, msg.sender, _sum);
-              
-        Credit memory credit;
-        credit.timeBegin = now;
-        credit.timeReturn = credit.timeBegin + (_duration * PERIOD);
-        credit.summa = _sum + (_sum * _duration * CREDITRATE) / 100 + (_sum * _duration * CREDITRATE) % 100;
-        credit.duration = _duration;
-        credit.clientWallet = msg.sender;
-        idCredit[msg.sender].push((creditArray.push(credit) - 1)) - 1; 
-        }
-        else 
-        { 
-            rate += _getRating(msg.sender);
-            if (rate < 10000)
-            {
-                _addToList(msg.sender, rate);
-                CheckCapital(_sum,true);
-                transferFrom(bankAcc, msg.sender, _sum);
-                Credit memory credit_else;
-                credit_else.timeBegin = now;
-                credit_else.timeReturn = credit_else.timeBegin + (_duration * PERIOD);
-                credit_else.summa = _sum + (_sum * _duration * CREDITRATE) / 100 + (_sum * _duration * CREDITRATE) % 100;
-                credit_else.duration = _duration;
-                credit_else.clientWallet = msg.sender;
-                idCredit[msg.sender].push((creditArray.push(credit_else) - 1)) - 1;
-            }
-            else 
-            {
-                throw;
-            }
-        }
-        }
-        else 
-        {
-            throw;
-        }
-    }
+function GetCredit(address _clientWallet, uint _sum, uint _duration) public checkInBlackList(msg.sender)
+   {
+       if (idCredit[_clientWallet].length < 5)
+       {
+
+       int rate = int(_sum) * int(_duration) * int(PERIOD)/60;
+       if ((list[_clientWallet].clientWallet != _clientWallet) && (rate < 10000))
+       {
+      _addToList(_clientWallet, rate);
+      CheckCapital(_sum,true);
+           transferFrom(bankAcc, _clientWallet, _sum);
+
+       Credit memory credit;
+       credit.timeBegin = now;
+       credit.timeReturn = credit.timeBegin + (_duration * PERIOD);
+       credit.summa = _sum + (_sum * _duration * CREDITRATE) / 100 + (_sum * _duration * CREDITRATE) % 100;
+       credit.duration = _duration;
+       credit.clientWallet = _clientWallet;
+       idCredit[_clientWallet].push((creditArray.push(credit) - 1)) - 1;
+       }
+       else
+       {
+           rate += _getRating(_clientWallet);
+           if (rate < 10000)
+           {
+               _addToList(_clientWallet, rate);
+               CheckCapital(_sum,true);
+               transferFrom(bankAcc, _clientWallet, _sum);
+               Credit memory credit_else;
+               credit_else.timeBegin = now;
+               credit_else.timeReturn = credit_else.timeBegin + (_duration * PERIOD);
+               credit_else.summa = _sum + (_sum * _duration * CREDITRATE) / 100 + (_sum * _duration * CREDITRATE) % 100;
+               credit_else.duration = _duration;
+               credit_else.clientWallet = _clientWallet;
+               idCredit[_clientWallet].push((creditArray.push(credit_else) - 1)) - 1;
+           }
+           else
+           {
+               throw;
+           }
+       }
+       }
+       else
+       {
+           throw;
+       }
+   }
     
     function CreditPay( address _clientWallet, uint _sum, uint _idCredit) public{
         //проверка на просрочку
