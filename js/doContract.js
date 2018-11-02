@@ -14,7 +14,7 @@ var Contract = web3.eth.contract(
     	gas: 1000000
 	}
 );
-var mainContract = Contract.at('0xf5ea7112054f1ffda76823a209de29abf778856a');
+var mainContract = Contract.at('0xffa7496eb361fe35f4dbd1ec57dadc06d3bd8d02');
 var version = web3.version.api;
 console.log(version);
 console.log(mainContract);
