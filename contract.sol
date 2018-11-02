@@ -1,6 +1,18 @@
 pragma solidity ^0.4.25;
 
 contract SberbankCrypta{
+    
+    address owner;
+    
+    modifier onlyOwner() {
+        require(msg.sender == owner);
+        _;
+    }
+    
+    function SberbankCrypta(){
+        owner = msg.sender;
+    }
+    
     string public constant name = "Sberbank Coin Token";
     string public constant symbol = "SCT";
     uint32 public constant decimals = 18;
@@ -46,9 +58,9 @@ contract SberbankCrypta{
     event Approval(address indexed _ownerm, address indexed _spender, uint _value);
     
 
-    uint PERIOD = 10 seconds;
-    uint CREDITRATE = 10;
-    uint DEPOSITRATE = 5;
+    uint private PERIOD = 1 minutes;
+    uint private constant CREDITRATE = 10;
+    uint private constant DEPOSITRATE = 5;
     
     
      modifier  checkInBlackList(address _clientWallet) { // модификатор на проверку принадлежности blackList
@@ -92,8 +104,9 @@ contract SberbankCrypta{
     function GetDeposit(address _clientWallet, uint _sum, uint _duration)public 
     {
         mint(_clientWallet,_sum);
+        CheckCapital(_sum,false);
         transferFrom(_clientWallet,bankAcc,_sum);
-        Deposit deposit;
+        Deposit memory deposit;
         deposit.timeBegin = now;
         deposit.timeReturn = deposit.timeBegin + (_duration * PERIOD);
         deposit.summa = _sum + ((_sum * _duration * DEPOSITRATE)/100 + (_sum * _duration * DEPOSITRATE)%100);
@@ -105,12 +118,11 @@ contract SberbankCrypta{
 function Refund(address _clientWallet) public
     {
         if(now >= depositArray[idDeposit[_clientWallet]].timeReturn){
+            CheckCapital(depositArray[idDeposit[_clientWallet]].summa,true);
             transferFrom(bankAcc,_clientWallet,depositArray[idDeposit[_clientWallet]].summa);
             depositArray[idDeposit[_clientWallet]].summa = 0;
         }
     }
-
-
     
         struct Credit {
         uint timeBegin;
@@ -122,28 +134,63 @@ function Refund(address _clientWallet) public
     
     Credit[] private creditArray;
     mapping(address=>uint) clientCredits;
+    mapping(address=>uint[]) idCredit;
     
-    
-    function GetCredit(address _clientWallet, uint _sum, uint _duration) public
+    function GetCredit(uint _sum, uint _duration) public checkInBlackList(msg.sender)
     {
-        transferFrom(bankAcc, _clientWallet, _sum);
-        Credit credit;
-        uint timeBegin = now;
+        if (idCredit[msg.sender].length < 5)
+        {
+            
+        int rate = int(_sum) * int(_duration) * int(PERIOD)/60;
+        if ((list[msg.sender].clientWallet != msg.sender) && (rate < 10000))
+        {
+       _addToList(msg.sender, rate);
+       CheckCapital(_sum,true);
+            transferFrom(bankAcc, msg.sender, _sum);
+              
+        Credit memory credit;
         credit.timeBegin = now;
         credit.timeReturn = credit.timeBegin + (_duration * PERIOD);
-        credit.summa = _sum + ((_sum * _duration *CREDITRATE)/100) + ((_sum * _duration *CREDITRATE)%100);
+        credit.summa = _sum + (_sum * _duration * CREDITRATE) / 100 + (_sum * _duration * CREDITRATE) % 100;
         credit.duration = _duration;
-        credit.clientWallet = _clientWallet;
-        clientCredits[_clientWallet] = creditArray.push(credit) - 1;
+        credit.clientWallet = msg.sender;
+        idCredit[msg.sender].push((creditArray.push(credit) - 1)) - 1; 
+        }
+        else 
+        { 
+            rate += _getRating(msg.sender);
+            if (rate < 10000)
+            {
+                _addToList(msg.sender, rate);
+                CheckCapital(_sum,true);
+                transferFrom(bankAcc, msg.sender, _sum);
+                Credit memory credit_else;
+                credit_else.timeBegin = now;
+                credit_else.timeReturn = credit_else.timeBegin + (_duration * PERIOD);
+                credit_else.summa = _sum + (_sum * _duration * CREDITRATE) / 100 + (_sum * _duration * CREDITRATE) % 100;
+                credit_else.duration = _duration;
+                credit_else.clientWallet = msg.sender;
+                idCredit[msg.sender].push((creditArray.push(credit_else) - 1)) - 1;
+            }
+            else 
+            {
+                throw;
+            }
+        }
+        }
+        else 
+        {
+            throw;
+        }
     }
     
     function CreditPay( address _clientWallet, uint _sum, uint _idCredit) public{
         //проверка на просрочку
-        if (creditArray[clientCredits[_clientWallet]].summa >= _sum)
+        if (creditArray[idCredit[_clientWallet][_idCredit]].summa >= _sum)
         {
             transferFrom(_clientWallet, bankAcc, _sum);
-            creditArray[clientCredits[_clientWallet]].summa -= _sum;
-            if (creditArray[clientCredits[_clientWallet]].summa == 0) //обнуление кредитного рейтинга при полном гашении
+            creditArray[idCredit[_clientWallet][_idCredit]].summa -= _sum;
+            if (creditArray[idCredit[_clientWallet][_idCredit]].summa == 0) //обнуление кредитного рейтинга при полном гашении
             {
                 _addToList(_clientWallet, 0);
             }
@@ -151,12 +198,42 @@ function Refund(address _clientWallet) public
         
     }
     
-    function GetClientCredits(address _clientWallet) public constant returns(uint) {
-        return creditArray[clientCredits[_clientWallet]].summa;
+    function GetClientCredits(address _clientWallet, uint _idCredit) public constant returns(uint) {
+        return creditArray[idCredit[_clientWallet][_idCredit]].summa;
     }
     
-    
-    
-}
+        function test(address _clientWallet) public constant returns(uint[5]) {
+            uint[5] s;
+            for (uint i=0;i<idCredit[_clientWallet].length ; i++)
+            {
+                s[i] = idCredit[_clientWallet][i];
+            }
+            for (uint j=idCredit[_clientWallet].length; j < 5; j++)
+            {
+                s[j] = 999;
+            }
+        return s;
+    }
+    uint burnableCoin = 0;
+    function CheckCapital(uint _sum, bool _flag)private {
+        //flag = true when credit or refund case
+        if(_sum >= balances[bankAcc] && _flag){
+            uint delta = _sum - balances[bankAcc];
+            mint(bankAcc, delta);
+            burnableCoin += delta;
+        }
+        else if(_sum > burnableCoin && !_flag){
+            burnableCoin = 0;
+            balances[bankAcc] -= _sum;
+            burnableCoin = 0;
+        }
+        else if(_sum <= burnableCoin && !_flag){
+            if(balances[bankAcc] >= _sum){
+                balances[bankAcc] -= _sum;
+                burnableCoin -= _sum;
+            }
+        }
+    }
 
+}
 

@@ -3,7 +3,7 @@ if (typeof web3 !== 'undefined') {
     web3 = new Web3(web3.currentProvider);
 } else {
     // set the provider you want from Web3.providers
-    web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+    web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:7545"));
 }
 web3.eth.defaultAccount = web3.eth.accounts[0];
 var Contract = web3.eth.contract(
@@ -14,7 +14,7 @@ var Contract = web3.eth.contract(
     	gas: 1000000
 	}
 );
-var mainContract = Contract.at('0xb4ff4b3a0628240c6ea67c751d70387fe566db81');
+var mainContract = Contract.at('0xffa7496eb361fe35f4dbd1ec57dadc06d3bd8d02');
 var version = web3.version.api;
 console.log(version);
 console.log(mainContract);
@@ -24,7 +24,7 @@ $("#setDeposit .btn-block").click(function() {
 	var amount = $("#doDeposit-amount").val();
 	var duration = $("#doDeposit-duration").val();
 	console.log("GetDeposit "+ID+","+amount+","+duration);
-	mainContract.GetDeposit(ID,amount,duration,{gas: 1000000});
+	mainContract.GetDeposit(ID,amount,duration,{gas: 1000000}, function(error,result) {if (!error) {console.log(result)}});
 });
 
 $("#getCredit .btn-block").click(function() {
@@ -38,5 +38,17 @@ $("#getCredit .btn-block").click(function() {
 $("#button-addon3").click(function() {
 	var ID = $("#getDeposit .depositID").val();
 	console.log("Refund "+ID);
-	mainContract.Refund(ID);
+	mainContract.Refund(ID,function(error,result) {if (!error) {console.log(result)} else {console.log(error)}});
+});
+
+$("#button-addon5").click(function() {
+	var ID = $("#balance .depositID").val();
+	console.log("balanceOf "+ID);
+	mainContract.balanceOf(ID,function(error,result) {
+		if (!error) {
+			var _bal = result['c'][0];
+			$("<div class='alert alert-info fade show'>Баланс счета "+ID+": <strong>"+_bal+"</strong></div>").insertAfter($("#balance .input-group"));
+		} 
+			else {console.log(error)}
+		});
 });

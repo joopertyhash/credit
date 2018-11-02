@@ -105,7 +105,7 @@
 					<div class="input-group mb-3">
 						  <input type="text" class="form-control depositID" placeholder="Введите кошелек" aria-label="Кошелек для депозита" aria-describedby="button-addon3">
 						  <div class="input-group-append">
-						    <button class="btn btn-outline-secondary" type="button" id="button-addon3">Забрать</button>
+						    <button class="btn btn-outline-secondary" type="button" id="button-addon3" >Забрать</button>
 						  </div>
 					</div>
 				</div>
@@ -118,8 +118,24 @@
 					<div class="input-group mb-3">
 						  <input type="text" class="form-control depositID" placeholder="Введите кошелек" aria-label="Кошелек для кредита" aria-describedby="button-addon4">
 						  <div class="input-group-append">
-						    <button class="btn btn-outline-secondary" type="button" id="button-addon4">Вернуть</button>
+						    <button class="btn btn-outline-secondary" type="button" id="button-addon4" data-toggle="collapse" data-target="#returnCreditAdditional" aria-expanded="false" aria-controls="returnCreditAdditional">Вернуть</button>
 						  </div>
+					</div>
+					<div class="collapse" id="returnCreditAdditional">
+					  <div class="card card-body">
+					    Сумма:
+						<div class="input-group mb-3">
+						  <input type="number" id="returnCredit-amount" class="form-control" aria-label="Amount">
+						  <div class="input-group-append">
+						    <span class="input-group-text">руб.</span>
+						  </div>
+						</div>
+					    Номер кредита:
+						<div class="input-group mb-3">
+						  <input type="number" id="returnCredit-ident" class="form-control" aria-label="ident">
+						</div>
+					    <button class="btn btn-info btn-block" id="returnCredit_button">Занять</button>
+					  </div>
 					</div>
 				</div>
 			</div>
