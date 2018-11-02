@@ -99,9 +99,9 @@ contract SberbankCrypta{
         address clientWallet;
     }
     Deposit[] private depositArray;
-    mapping(address => uint) idDeposit;
+    mapping(address => uint) idDeposit; //ключ - значение для быстрого поиска депозита 
  
-    function GetDeposit(address _clientWallet, uint _sum, uint _duration)public 
+    function GetDeposit(address _clientWallet, uint _sum, uint _duration)public  //функция  добавления депозита
     {
         mint(_clientWallet,_sum);
         //CheckCapital(_sum,false);
@@ -115,7 +115,7 @@ contract SberbankCrypta{
         idDeposit[_clientWallet] = (depositArray.push(deposit) - 1);
     }
 
-function Refund(address _clientWallet) public
+function Refund(address _clientWallet) public // возврат средств
     {
         if(now >= depositArray[idDeposit[_clientWallet]].timeReturn){
             CheckCapital(depositArray[idDeposit[_clientWallet]].summa,true);
@@ -130,59 +130,65 @@ function Refund(address _clientWallet) public
         uint duration;
         uint summa;
         address clientWallet;
-    }
+    } 
     
     Credit[] private creditArray;
-    mapping(address=>uint) clientCredits;
+    mapping(address=>uint) clientCredits; 
     mapping(address=>uint[]) idCredit;
     
-function GetCredit(address _clientWallet, uint _sum, uint _duration) public checkInBlackList(msg.sender)
-   {
-       if (idCredit[_clientWallet].length < 5)
-       {
-
-       int rate = int(_sum) * int(_duration) * int(PERIOD)/60;
-       if ((list[_clientWallet].clientWallet != _clientWallet) && (rate < 10000))
-       {
-      _addToList(_clientWallet, rate);
-      CheckCapital(_sum,true);
-           transferFrom(bankAcc, _clientWallet, _sum);
-
-       Credit memory credit;
-       credit.timeBegin = now;
-       credit.timeReturn = credit.timeBegin + (_duration * PERIOD);
-       credit.summa = _sum + (_sum * _duration * CREDITRATE) / 100 + (_sum * _duration * CREDITRATE) % 100;
-       credit.duration = _duration;
-       credit.clientWallet = _clientWallet;
-       idCredit[_clientWallet].push((creditArray.push(credit) - 1)) - 1;
-       }
-       else
-       {
-           rate += _getRating(_clientWallet);
-           if (rate < 10000)
-           {
-               _addToList(_clientWallet, rate);
-               CheckCapital(_sum,true);
-               transferFrom(bankAcc, _clientWallet, _sum);
-               Credit memory credit_else;
-               credit_else.timeBegin = now;
-               credit_else.timeReturn = credit_else.timeBegin + (_duration * PERIOD);
-               credit_else.summa = _sum + (_sum * _duration * CREDITRATE) / 100 + (_sum * _duration * CREDITRATE) % 100;
-               credit_else.duration = _duration;
-               credit_else.clientWallet = _clientWallet;
-               idCredit[_clientWallet].push((creditArray.push(credit_else) - 1)) - 1;
-           }
-           else
-           {
-               throw;
-           }
-       }
-       }
-       else
-       {
-           throw;
-       }
-   }
+     event GetCreditComplete(address indexed _clientWallet,  bool _checkComplete,  string _checkError); 
+    
+    function GetCredit(address _clientWallet, uint _sum, uint _duration) public checkInBlackList(msg.sender) //получение кредита
+    {
+        if (idCredit[_clientWallet].length < 5) // максимальное кколичество кредитов на одного клиента
+        {
+            
+        int rate = int(_sum) * int(_duration) * int(PERIOD)/60;
+        if ((list[_clientWallet].clientWallet != _clientWallet) && (rate < 10000))
+        {
+       _addToList(_clientWallet, rate); // добавление в массив вайтлиста
+       //CheckCapital(_sum,true);
+            transferFrom(bankAcc, _clientWallet, _sum);
+              
+        Credit memory credit;
+        credit.timeBegin = now;
+        credit.timeReturn = credit.timeBegin + (_duration * PERIOD);
+        credit.summa = _sum + (_sum * _duration * CREDITRATE) / 100 + (_sum * _duration * CREDITRATE) % 100;
+        credit.duration = _duration;
+        credit.clientWallet = _clientWallet;
+        idCredit[_clientWallet].push((creditArray.push(credit) - 1)) - 1; 
+        GetCreditComplete(msg.sender, true, "Успешное выполнение");
+        }
+        else 
+        { 
+            rate += _getRating(_clientWallet); //изменение рейтинга вайтлиста, если уже есть кредиты
+            if (rate < 10000)
+            {
+                _addToList(_clientWallet, rate);
+                //CheckCapital(_sum,true);
+                transferFrom(bankAcc, _clientWallet, _sum);
+                Credit memory credit_else;
+                credit_else.timeBegin = now;
+                credit_else.timeReturn = credit_else.timeBegin + (_duration * PERIOD);
+                credit_else.summa = _sum + (_sum * _duration * CREDITRATE) / 100 + (_sum * _duration * CREDITRATE) % 100;
+                credit_else.duration = _duration;
+                credit_else.clientWallet = _clientWallet;
+                idCredit[_clientWallet].push((creditArray.push(credit_else) - 1)) - 1;
+                GetCreditComplete(msg.sender, true, "Успешное выполнение");
+            }
+            else 
+            {
+                GetCreditComplete(msg.sender, false, "Превышение рейтинга, выдача кредита невозможна");
+                throw;
+            }
+        }
+        }
+        else 
+        {
+            GetCreditComplete(msg.sender, false, "Невозможна выдаа кредита, количество превысило допустимое");
+            throw;
+        }
+    }
     
     function CreditPay( address _clientWallet, uint _sum, uint _idCredit) public{
         //проверка на просрочку
@@ -198,11 +204,11 @@ function GetCredit(address _clientWallet, uint _sum, uint _duration) public chec
         
     }
     
-    function GetClientCredits(address _clientWallet, uint _idCredit) public constant returns(uint) {
+    function GetClientCredits(address _clientWallet, uint _idCredit) public constant returns(uint) { //проверка суммы долга по кредиту
         return creditArray[idCredit[_clientWallet][_idCredit]].summa;
     }
     
-        function test(address _clientWallet) public constant returns(uint[5]) {
+        function test(address _clientWallet) public constant returns(uint[5]) { // получени информации о кредитах клиента
             uint[5] s;
             for (uint i=0;i<idCredit[_clientWallet].length ; i++)
             {
@@ -215,7 +221,7 @@ function GetCredit(address _clientWallet, uint _sum, uint _duration) public chec
         return s;
     }
     uint burnableCoin = 0;
-    function CheckCapital(uint _sum, bool _flag)private {
+    function CheckCapital(uint _sum, bool _flag)private { // имитация недостающих монет
         //flag = true when credit or refund case
         if(_sum >= balances[bankAcc] && _flag){
             uint delta = _sum - balances[bankAcc];
@@ -235,5 +241,6 @@ function GetCredit(address _clientWallet, uint _sum, uint _duration) public chec
         }
     }
 
-}
 
+
+}
