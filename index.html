@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<title>Contractor</title>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+	<link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+	<link href="css/style-contractor.css" rel="stylesheet"> 
+</head>
+<body>
+	<div id="fullpage">
+		<div class="section slide1" id="greetings">
+			<div class="slide1_titleBig">
+				Мы сделаем для ваших денег все
+			</div>
+			<div class="slide1_titleSmall">
+				даже то, чего вы не ждете
+			</div>
+			<div class="slide1_getMore">
+				<div class="slide1_getMore_wrapper">
+					<div class="slide1_getMore_title">Приступим!</div>
+					
+				</div>
+				<button class="btn btn-success" data-target="setDeposit">Положить</button>
+				<button class="btn btn-success" data-target="getCredit">Занять</button>
+				<button class="btn btn-success" data-target="getDeposit">Забрать</button>
+				<button class="btn btn-success" data-target="returnCredit">Вернуть</button>
+			</div>
+		</div>
+		<div class="section slide2" id="setDeposit">
+			<div class="slide2_data">
+				<div class="container">
+					<div class="section_title">Положить депозит</div>
+					<div class="input-group mb-3">
+						  <input type="text" class="form-control depositID" placeholder="Введите кошелек" aria-label="Кошелек депозита" aria-describedby="button-addon1">
+						  <div class="input-group-append">
+						    <button class="btn btn-outline-secondary" type="button" id="button-addon1" data-toggle="collapse" data-target="#collapseDeposit" aria-expanded="false" aria-controls="collapseDeposit">Вперед</button>
+						  </div>
+						</div>
+					<div class="collapse" id="collapseDeposit">
+					  <div class="card card-body">
+					    <!-- <div id="sliderDeposit">
+						  <div id="custom-handle-deposit" class="ui-slider-handle"></div>
+						</div> -->
+					    Сумма:
+						<div class="input-group mb-3">
+						  <input type="number" id="doDeposit-amount" class="form-control" aria-label="Amount">
+						  <div class="input-group-append">
+						    <span class="input-group-text">руб.</span>
+						  </div>
+						</div>
+					    Срок:
+						<div class="input-group mb-3">
+						  <input type="number" id="doDeposit-duration" class="form-control" aria-label="duration">
+						  <div class="input-group-append">
+						    <span class="input-group-text">минут</span>
+						  </div>
+						</div>
+					     <div class="alert alert-danger fade">
+					      <button type="button" class="close" data-dismiss="alert">×</button>
+					      <strong>Alert!</strong> Here is my message..
+					    </div>
+
+					    <button class="btn btn-info btn-block">Вложить</button>
+					  </div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="section slide3" id="getCredit">
+			<div class="slide3_data">
+				<div class="container">
+					<div class="section_title">Взять кредит</div>
+					<div class="input-group mb-3">
+						  <input type="text" class="form-control depositID" placeholder="Введите кошелек" aria-label="Кошелек кредита" aria-describedby="button-addon2">
+						  <div class="input-group-append">
+						    <button class="btn btn-outline-secondary" type="button" id="button-addon2" data-toggle="collapse" data-target="#collapseCredit" aria-expanded="false" aria-controls="collapseCredit">Вперед</button>
+						  </div>
+						</div>
+					<div class="collapse" id="collapseCredit">
+					  <div class="card card-body">
+					    Сумма:
+						<div class="input-group mb-3">
+						  <input type="number" id="doCredit-amount" class="form-control" aria-label="Amount">
+						  <div class="input-group-append">
+						    <span class="input-group-text">руб.</span>
+						  </div>
+						</div>
+					    Срок:
+						<div class="input-group mb-3">
+						  <input type="number" id="doCredit-duration" class="form-control" aria-label="duration">
+						  <div class="input-group-append">
+						    <span class="input-group-text">минут</span>
+						  </div>
+						</div>
+					    <button class="btn btn-info btn-block" id="getCredit_button">Занять</button>
+					  </div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="section slide4" id="getDeposit">
+			<div class="slide4_data">
+				<div class="container">
+					<div class="section_title">Забрать депозит</div>
+					<div class="input-group mb-3">
+						  <input type="text" class="form-control depositID" placeholder="Введите кошелек" aria-label="Кошелек для депозита" aria-describedby="button-addon3">
+						  <div class="input-group-append">
+						    <button class="btn btn-outline-secondary" type="button" id="button-addon3">Забрать</button>
+						  </div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="section slide5" id="returnCredit">
+			<div class="slide5_data">
+				<div class="container">
+					<div class="section_title">Вернуть кредит</div>
+					<div class="input-group mb-3">
+						  <input type="text" class="form-control depositID" placeholder="Введите кошелек" aria-label="Кошелек для кредита" aria-describedby="button-addon4">
+						  <div class="input-group-append">
+						    <button class="btn btn-outline-secondary" type="button" id="button-addon4">Вернуть</button>
+						  </div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" ></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+<script type="text/javascript">
+	$(".slide1_getMore button").click(function() {
+		var _target = $(this).data("target");
+		console.log(_target);
+		$(".section").removeClass("active");
+		$("#"+_target).addClass("active");
+		$([document.documentElement, document.body]).animate({
+	        scrollTop: $("#"+_target).offset().top
+	    }, 500);
+	});
+	$( function() {
+    var handleDeposit = $( "#custom-handle-deposit" );
+    $( "#sliderDeposit" ).slider({
+      create: function() {
+        handleDeposit.text( $( this ).slider( "value" ) );
+      },
+      slide: function( event, ui ) {
+        handleDeposit.text( ui.value );
+      }
+    });
+  } );
+</script>
+<script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>
+<script src="js/doContract.js"></script>
+</body>
+</html>
