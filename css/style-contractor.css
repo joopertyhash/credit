@@ -8,7 +8,7 @@ body,html{margin:0;padding:0;min-width:320px;position:relative;height:auto;min-h
 .section .section_title {color:black;font-weight: bold; }
 .section .card {color:black;}
 .section {padding: 60px 0;}
-.section .container {padding: 50px;}
+.section .container {padding: 50px 150px;}
 .slide1 .slide1_getMore button {margin: 0 10px;}
 .section .container {border: 2px solid #fff;border-radius: 5px;transition: all 1s ease-out;}
 .section.active .container {border-color: blue;}
